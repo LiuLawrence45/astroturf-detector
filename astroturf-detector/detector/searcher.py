@@ -6,12 +6,13 @@ from rich import print as rprint
 from rich.panel import Panel
 from rich.console import Console
 
-proxy = "http://272fa0a72b6a0f39e1f4__cr.gb,us:7dae8f8fcce7d3db@gw.dataimpulse.com:823"
-proxy2 = "http://272fa0a72b6a0f39e1f4__cr.fr,de,nl,sg,za,kr,gb,us:7dae8f8fcce7d3db@gw.dataimpulse.com:823"
+# proxy = "http://272fa0a72b6a0f39e1f4__cr.gb,us:7dae8f8fcce7d3db@gw.dataimpulse.com:823"
+# proxy2 = "http://272fa0a72b6a0f39e1f4__cr.fr,de,nl,sg,za,kr,gb,us:7dae8f8fcce7d3db@gw.dataimpulse.com:823"
+proxy = "http://272fa0a72b6a0f39e1f4__cr.fr,de,nl,sg,za,kr,gb,us:7dae8f8fcce7d3db@gw.dataimpulse.com:823"
 
 console = Console()
 
-def search_with_retry(query: str, max_retries = 5) -> Optional[List[SearchResult]]:
+def search_with_retry(query: str, max_retries = 10) -> Optional[List[SearchResult]]:
     
     """
     Perform a Google search with retry logic.
@@ -42,12 +43,14 @@ def search_with_retry(query: str, max_retries = 5) -> Optional[List[SearchResult
             if i < max_retries - 1:
                 console.print(f"[blue]Waiting {retry_delay}s before next attempt...[/blue]")
                 time.sleep(retry_delay)
-                retry_delay *= 2
+                
+                if retry_delay < 8:
+                    retry_delay *= 2
 
     return None
     
 
-def search_reddit(url: str) -> Dict:
+def process_url(url: str, max_retries = 10) -> Dict:
     """
         Detect potential astroturfing for a given URL by searching Reddit mentions.
         
@@ -55,7 +58,10 @@ def search_reddit(url: str) -> Dict:
             url (str): The URL to check for astroturfing
         
         Returns:
-            dict: Contains count of mentions and list of Reddit posts
+            dict: Dictionary containing:
+                - direct_mention_count (int): Number of direct mentions found
+                - direct_mentions (List[SearchResult]): List of mentions with url, title and description
+                - all_search_results (List[SearchResult]): All search results returned
     """ 
     
     mentions = []
@@ -66,7 +72,7 @@ def search_reddit(url: str) -> Dict:
     # What we're going to query google.
     query = f'site:reddit.com "{sanitized_url}"'
     
-    search_results = search_with_retry(query = query, max_retries = 5)
+    search_results = search_with_retry(query = query, max_retries = max_retries)
     
     # Processing all results.
     if search_results is not None: 
@@ -86,6 +92,8 @@ def search_reddit(url: str) -> Dict:
                 #     title="Reddit Mention",
                 #     border_style="cyan"
                 # ))
+        
+        
         console.print(Panel(
             f"[green]Search Results Summary[/green]\n"
             f"[blue]URL:[/blue] {url}\n"
@@ -95,8 +103,9 @@ def search_reddit(url: str) -> Dict:
             border_style="green"
         ))
         return {
-            'count': len(mentions), 
-            'mentions':   mentions
+            'direct_mention_count': len(mentions), 
+            'direct_mentions':   mentions,
+            'all_search_results': search_results
         };
                 
     else:
@@ -107,5 +116,6 @@ def search_reddit(url: str) -> Dict:
 
 
 if __name__ == "__main__":
-    search_reddit("https://willow.international/")
+    results = process_url("https://www.undermind.ai/")
+    print(results)
     
