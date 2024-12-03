@@ -8,7 +8,8 @@ from rich.console import Console
 
 # proxy = "http://272fa0a72b6a0f39e1f4__cr.gb,us:7dae8f8fcce7d3db@gw.dataimpulse.com:823"
 # proxy2 = "http://272fa0a72b6a0f39e1f4__cr.fr,de,nl,sg,za,kr,gb,us:7dae8f8fcce7d3db@gw.dataimpulse.com:823"
-proxy = "http://272fa0a72b6a0f39e1f4__cr.fr,de,nl,sg,za,kr,gb,us:7dae8f8fcce7d3db@gw.dataimpulse.com:823"
+# proxy = "http://272fa0a72b6a0f39e1f4__cr.fr,de,nl,sg,za,kr,gb,us:7dae8f8fcce7d3db@gw.dataimpulse.com:823"
+proxy = "http://8548dbb423b58af162f8:5b3f3f690b3e882d@gw.dataimpulse.com:823"
 
 console = Console()
 

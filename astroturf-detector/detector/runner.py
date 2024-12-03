@@ -57,8 +57,8 @@ def process_batch(df: DataFrame, batch_start_index: int, batch_size: int):
         
         if result:
             with results_lock:
-                df.at[index, 'direct_mentions_count'] = result.get('direct_mentions_count')
-                df.at[index, 'direct_mentions'] = str(result.get('mentions'))
+                df.at[index, 'direct_mentions_count'] = result.get('direct_mention_count')
+                df.at[index, 'direct_mentions'] = str(result.get('direct_mentions'))
                 df.at[index, 'all_search_results'] = str(result.get('all_search_results'))
                 
         else:
@@ -82,17 +82,16 @@ if __name__ == "__main__":
     # df = pd.read_csv('input.csv')
     # df = df[['company_name', 'short_description','website']]
     # df.to_csv('minimal_input.csv', index=False)
-    df = pd.read_csv('results/default.csv')
-    df = df.head(8)
     checkpoint = get_checkpoint()
+    df = pd.read_csv('results/default.csv')
     print(f"Checkpoint is: ", checkpoint)
     amount = int(input("Enter the amount you want to process (multiple of 8): "))
     
     end_index = checkpoint + amount
-    batch_size = 4
+    batch_size = 128
     for i in range(checkpoint, end_index, batch_size):
-        process_batch(df, checkpoint, batch_size);
-        df.to_csv(f"results/batch_{checkpoint}_{i+batch_size}")
+        process_batch(df, i, batch_size);
+        df.to_csv(f"results/batch_{checkpoint}_{i+batch_size}.csv")
     
     # df = df.head(8)
     # print(df)
